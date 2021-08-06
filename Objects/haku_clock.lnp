@@ -1,7 +1,0 @@
-".\Objects\STARTUP.obj",
-".\Objects\main.obj",
-".\Objects\ds3231.obj",
-".\Objects\lcd1602.obj",
-".\Objects\pms7003.obj" 
-TO ".\Objects\haku_clock" 
-PRINT(".\Listings\haku_clock.m51") RAMSIZE(256) 
