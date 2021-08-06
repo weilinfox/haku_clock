@@ -1,0 +1,29 @@
+C51 COMPILER V9.59.0.0   PMS7003                                                           08/06/2021 00:47:17 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE PMS7003
+OBJECT MODULE PLACED IN .\Objects\pms7003.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE pms7003.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\p
+                    -ms7003.lst) TABS(10) OBJECT(.\Objects\pms7003.obj)
+
+line level    source
+
+   1          
+   2          void init_pms(void)
+   3          {
+   4   1      }
+   5          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =      1    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,183 @@
+C51 COMPILER V9.59.0.0   DS3231                                                            08/06/2021 00:47:17 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE DS3231
+OBJECT MODULE PLACED IN .\Objects\ds3231.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ds3231.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\ds
+                    -3231.lst) TABS(10) OBJECT(.\Objects\ds3231.obj)
+
+line level    source
+
+   1          #include <reg52.h>
+   2          #include <intrins.h>
+   3          
+   4          #include "types.h"
+   5          #include "ds3231.h"
+   6          
+   7          void ds_delay (void)
+   8          {
+   9   1                _nop_(); _nop_(); _nop_(); _nop_();
+  10   1      }
+  11          
+  12          void ds_init (void)
+  13          {
+  14   1                CLKSDA = 1;
+  15   1                CLKSCL = 1;
+  16   1      }
+  17          
+  18          void ds_iic_start (void)
+  19          {
+  20   1                CLKSDA = 1;
+  21   1                CLKSCL = 1;
+  22   1                ds_delay();
+  23   1                CLKSDA = 0;
+  24   1                ds_delay();
+  25   1                CLKSCL = 0;
+  26   1                ds_delay();
+  27   1      }
+  28          
+  29          void ds_iic_stop (void)
+  30          {
+  31   1                CLKSDA = 0;
+  32   1                CLKSCL = 1;
+  33   1                ds_delay();
+  34   1                CLKSDA = 1;
+  35   1                ds_delay();
+  36   1      }
+  37          
+  38          void ds_iic_write (u8 dat)
+  39          {
+  40   1                u8 i;
+  41   1                for (i = 8; i; i--) {
+  42   2                          CLKSDA = dat & 0x80;
+  43   2                          ds_delay();
+  44   2                          CLKSCL = 1;
+  45   2                          ds_delay();
+  46   2                          CLKSCL = 0;
+  47   2                          ds_delay();
+  48   2                          dat <<= 1;
+  49   2                }
+  50   1      }
+  51          
+  52          u8 ds_iic_read (void)
+  53          {
+  54   1                u8 i, dat = 0;
+C51 COMPILER V9.59.0.0   DS3231                                                            08/06/2021 00:47:17 PAGE 2   
+
+  55   1                for (i = 8; i; i--) {
+  56   2                          CLKSCL = 1;
+  57   2                          ds_delay();
+  58   2                          dat <<= 1;
+  59   2                          if (CLKSDA)
+  60   2                                    dat |= 0x01;
+  61   2                          CLKSCL = 0;
+  62   2                          ds_delay();
+  63   2                          
+  64   2                }
+  65   1                return dat;
+  66   1      }
+  67          
+  68          void ds_iic_write_ack (void)
+  69          {
+  70   1                CLKSDA = 0;
+  71   1                ds_delay();
+  72   1                CLKSCL = 1;
+  73   1                ds_delay();
+  74   1                CLKSCL = 0;
+  75   1                ds_delay();
+  76   1      }
+  77          
+  78          void ds_iic_write_nack (void)
+  79          {
+  80   1                CLKSDA = 1;
+  81   1                CLKSCL = 1;
+  82   1                ds_delay();
+  83   1                CLKSCL = 0;
+  84   1                ds_delay();
+  85   1      }
+  86          
+  87          bit ds_iic_read_ack (void)
+  88          {
+  89   1                bit ack;
+  90   1                //CLKSDA = 1;
+  91   1                CLKSCL = 1;
+  92   1                ds_delay();
+  93   1                ack = CLKSDA;
+  94   1                ds_delay();
+  95   1                CLKSCL = 0;
+  96   1                ds_delay();
+  97   1                return ack;
+  98   1      }
+  99          
+ 100          void ds_read_data(struct time * tm)
+ 101          {
+ 102   1                u8 dat;
+ 103   1      
+ 104   1                ds_iic_start();
+ 105   1                ds_iic_write(CLK_DEV_ADDR);
+ 106   1                ds_iic_read_ack();            ds_delay();ds_delay();
+ 107   1                ds_iic_write(CLK_ADDR_TIME);
+ 108   1                ds_iic_read_ack();            ds_delay();ds_delay();
+ 109   1                ds_iic_start();
+ 110   1                ds_iic_write(CLK_DEV_READ);
+ 111   1                ds_iic_read_ack();            ds_delay();ds_delay();
+ 112   1                dat = ds_iic_read();
+ 113   1                ds_iic_write_ack();           ds_delay();ds_delay();
+ 114   1                tm->time.second = (dat>>4)*10 + (dat&0x0f);
+ 115   1                dat = ds_iic_read();
+ 116   1                ds_iic_write_ack();           ds_delay();ds_delay();
+C51 COMPILER V9.59.0.0   DS3231                                                            08/06/2021 00:47:17 PAGE 3   
+
+ 117   1                tm->time.minute = (dat>>4)*10 + (dat&0x0f);
+ 118   1                dat = ds_iic_read();
+ 119   1                ds_iic_write_ack();           ds_delay();ds_delay();
+ 120   1                tm->time.hour = dat;
+ 121   1                /*if (dat & 0x40) {
+ 122   1                          tm->time.as24 = 0;
+ 123   1                          if (dat & 0x20) tm->time.am = 0;
+ 124   1                          else tm->time.am = 1;
+ 125   1                          if (dat & 0x10) tm->time.hour = 10;
+ 126   1                          else tm->time.hour = 0;
+ 127   1                          tm->time.hour += dat & 0x0f;
+ 128   1                } else {
+ 129   1                          tm->time.as24 = 1;
+ 130   1                          switch (dat & 0x30) {
+ 131   1                                    case 0x10:
+ 132   1                                              tm->time.hour = 10;
+ 133   1                                              break;
+ 134   1                                    case 0x20:
+ 135   1                                              tm->time.hour = 20;
+ 136   1                                              break;
+ 137   1                                    default:
+ 138   1                                              tm->time.hour = 0;
+ 139   1                          }
+ 140   1                          tm->time.hour += dat & 0x0f;
+ 141   1                }*/
+ 142   1                dat = ds_iic_read();
+ 143   1                ds_iic_write_ack();           ds_delay();ds_delay();
+ 144   1                tm->day = dat;
+ 145   1                dat = ds_iic_read();
+ 146   1                ds_iic_write_ack();           ds_delay();ds_delay();
+ 147   1                tm->date = dat;
+ 148   1                dat = ds_iic_read();
+ 149   1                ds_iic_write_ack();           ds_delay();ds_delay();
+ 150   1                tm->month = dat;
+ 151   1                dat = ds_iic_read();
+ 152   1                ds_iic_write_nack();
+ 153   1                tm->year = dat;
+ 154   1                ds_iic_stop();
+ 155   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    267    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       1
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

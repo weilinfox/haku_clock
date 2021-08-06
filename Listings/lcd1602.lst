@@ -1,0 +1,257 @@
+C51 COMPILER V9.59.0.0   LCD1602                                                           08/06/2021 00:47:17 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE LCD1602
+OBJECT MODULE PLACED IN .\Objects\lcd1602.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE lcd1602.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\l
+                    -cd1602.lst) TABS(10) OBJECT(.\Objects\lcd1602.obj)
+
+line level    source
+
+   1          #include <reg52.h>
+   2          
+   3          #include "types.h"
+   4          #include "lcd1602.h"
+   5          
+   6          /* edit frame address table */
+   7          u8 code LCD_CLK_EDIT_POS[] =  {0x83, 0x84, 0x85, 0x86,      /* yyyy */
+   8                                        0x88, 0x89,                   /* mm */
+   9                                        0x8a, 0x8b,                   /* dd */
+  10                                        0xc4, 0xc5,                   /* hh */
+  11                                        0xc7, 0xc8,                   /* mm */
+  12                                        0xc9, 0xca                    /* ss */ };
+  13          u8 code LCD_CLK_EDIT_POS2[] = {0x83, 0x84, 0x85, 0x86,      /* yyyy */
+  14                                        0x88, 0x89,                   /* mm */
+  15                                        0x8a, 0x8b,                   /* dd */
+  16                                        0xc2, 0xc3,                   /* hh */
+  17                                        0xc5, 0xc6,                   /* mm */
+  18                                        0xc8, 0xc9                    /* ss */ };
+  19          u8 code LCD_ALAM_EDIT_POS[] = {0x88, 0x89, 0x8b, 0x8c, 0x8e, 0x8f,
+  20                                        0xc8, 0xc9, 0xcb, 0xcc, 0xce, 0xcf};
+  21          u8 code LCD_NUM_CHAR[] = "0123456789";
+  22          
+  23          void lcd_delay200us (u8 t)
+  24          {
+  25   1                u8 i;
+  26   1                for (; t; t--)
+  27   1                          for (i = 100; i; i--) ;
+  28   1      }
+  29          
+  30          void lcd_debug_delay(void)
+  31          {
+  32   1                u8 i;
+  33   1                DEBUG = 0;          /* light on */
+  34   1                for (i=10; i; i--)
+  35   1                          lcd_delay200us(255);
+  36   1                DEBUG = 1;          /* light off */
+  37   1                for (i=10; i; i--)
+  38   1                          lcd_delay200us(255);
+  39   1      }
+  40          
+  41          void lcd_busy_wait (void)
+  42          {
+  43   1                LCDEN = 0;
+  44   1                LCDDATA &= 0xc0;
+  45   1                LCDDATA |= LCD_COM_Rbusy;
+  46   1                LCDEN = 1;
+  47   1                lcd_delay200us(10);
+  48   1                while (LCDBUSY) {DEBUG=1; DEBUG=0;}
+  49   1                LCDEN = 0;
+  50   1      }
+  51          
+  52          void lcd_send_string (u8 *str, u8 len)
+  53          {
+  54   1                u8 i;
+C51 COMPILER V9.59.0.0   LCD1602                                                           08/06/2021 00:47:17 PAGE 2   
+
+  55   1                for (i = 0; i < len; i++) {
+  56   2                          LCD_SEND_DATA(str[i]);
+  57   2                }
+  58   1      }
+  59          
+  60          void lcd_send_int (u16 d, u16 flag)
+  61          {
+  62   1                while (flag) {
+  63   2                          LCD_SEND_DATA(LCD_NUM_CHAR[d/flag]);
+  64   2                          d %= flag;
+  65   2                          flag /= 10;
+  66   2                }
+  67   1      }
+  68          
+  69          void lcd_init (void)
+  70          {
+  71   1                /* the highest 2 bits are not used */
+  72   1      /*        LCDDATA &= 0xc0;
+  73   1                lcd_delay200us(80);
+  74   1                LCDDATA |= 0x03;
+  75   1                LCDEN = 1;
+  76   1                LCDEN = 0;
+  77   1                lcd_delay200us(25);
+  78   1                LCDDATA &= 0xc0;
+  79   1                LCDDATA |= 0x03;
+  80   1                LCDEN = 1;
+  81   1                LCDEN = 0;
+  82   1                lcd_delay200us(1);
+  83   1                LCDDATA &= 0xc0;
+  84   1                LCDDATA |= 0x03;
+  85   1                LCDEN = 1;
+  86   1                LCDEN = 0;
+  87   1                lcd_delay200us(1);
+  88   1                LCDDATA &= 0xc0;
+  89   1                LCDDATA |= 0x02;
+  90   1                LCDEN = 1;
+  91   1                LCDEN = 0;
+  92   1                lcd_delay200us(1);*/
+  93   1      
+  94   1                LCD_INIT_COM(LCD_COM_Setfunc, 1);
+  95   1      
+  96   1                LCD_INIT_COM(LCD_COM_Setfunc, 1);
+  97   1                LCD_INIT_COM(LCD_COM_HIDE, 1);
+  98   1                LCD_INIT_COM(LCD_COM_Clear, 10);
+  99   1                LCD_INIT_COM(LCD_COM_Setmode, 1);
+ 100   1                LCD_SEND_COM(LCD_COM_Cursoroff);
+ 101   1      }
+ 102          
+ 103          /* ___yyyy/mm/dd___ */
+ 104          /* ____xx:xx:xx____ */
+ 105          /* __xx:xx:xx__AM__ */
+ 106          void lcd_show_clock (struct time * tm)
+ 107          {
+ 108   1                LCD_SEND_COM(LCD_COM_Line1);
+ 109   1      
+ 110   1                lcd_send_string("   ", 3);
+ 111   1                lcd_send_int(tm->year, 1000);
+ 112   1                lcd_send_string("/", 1);
+ 113   1                lcd_send_int(tm->month, 10);
+ 114   1                lcd_send_string("/", 1);
+ 115   1                lcd_send_int(tm->date, 10);
+ 116   1                lcd_send_string("   ", 3);
+C51 COMPILER V9.59.0.0   LCD1602                                                           08/06/2021 00:47:17 PAGE 3   
+
+ 117   1      
+ 118   1                LCD_SEND_COM(LCD_COM_Line2);
+ 119   1      
+ 120   1                if (tm->time.as24) lcd_send_string("    ", 4);
+ 121   1                else lcd_send_string("  ", 2);
+ 122   1                lcd_send_int(tm->time.hour, 10);
+ 123   1                lcd_send_string(":", 1);
+ 124   1                lcd_send_int(tm->time.minute, 10);
+ 125   1                lcd_send_string(":", 1);
+ 126   1                lcd_send_int(tm->time.second, 10);
+ 127   1                if (tm->time.as24) lcd_send_string("    ", 4);
+ 128   1                else {
+ 129   2                          lcd_send_string("  ", 2);
+ 130   2                          if (tm->time.am) lcd_send_string("AM", 2);
+ 131   2                          else lcd_send_string("PM", 2);
+ 132   2                          lcd_send_string("  ", 2);
+ 133   2                }
+ 134   1      
+ 135   1                if (tm->edit) {
+ 136   2                          if (tm->time.as24) {
+ 137   3                                    LCD_SEND_COM(LCD_CLK_EDIT_POS[tm->editpos]);
+ 138   3                          } else {
+ 139   3                                    LCD_SEND_COM(LCD_CLK_EDIT_POS2[tm->editpos]);
+ 140   3                          }
+ 141   2                          LCD_SEND_COM(LCD_COM_Cursorflash);
+ 142   2                } else {
+ 143   2                          LCD_SEND_COM(LCD_COM_Cursoroff);
+ 144   2                }
+ 145   1      }
+ 146          
+ 147          /* Alarm1: xx:xx:xx */
+ 148          /* Alarm2: xx:xx:xx */
+ 149          void lcd_show_alarm (struct alarms * ala)
+ 150          {
+ 151   1                LCD_SEND_COM(LCD_COM_Line1);
+ 152   1      
+ 153   1                lcd_send_string("Alarm1: ", 8);
+ 154   1                lcd_send_int(ala->alarm1.hour, 10);
+ 155   1                lcd_send_string(":", 1);
+ 156   1                lcd_send_int(ala->alarm1.minute, 10);
+ 157   1                lcd_send_string(":", 1);
+ 158   1                lcd_send_int(ala->alarm1.second, 10);
+ 159   1                
+ 160   1                LCD_SEND_COM(LCD_COM_Line2);
+ 161   1      
+ 162   1                lcd_send_string("Alarm2: ", 8);
+ 163   1                lcd_send_int(ala->alarm2.hour, 10);
+ 164   1                lcd_send_string(":", 1);
+ 165   1                lcd_send_int(ala->alarm2.minute, 10);
+ 166   1                lcd_send_string(":", 1);
+ 167   1                lcd_send_int(ala->alarm2.second, 10);
+ 168   1                
+ 169   1                if (ala->edit) {
+ 170   2                          LCD_SEND_COM(LCD_ALAM_EDIT_POS[ala->editpos]);
+ 171   2                          LCD_SEND_COM(LCD_COM_Cursorflash);
+ 172   2                } else {
+ 173   2                          LCD_SEND_COM(LCD_COM_Cursoroff);
+ 174   2                }
+ 175   1      }
+ 176          
+ 177          /* T:-xx.x_C RH:xx% */
+ 178          /* PM2.5: xxx ug/m3 */
+C51 COMPILER V9.59.0.0   LCD1602                                                           08/06/2021 00:47:17 PAGE 4   
+
+ 179          void lcd_show_env(struct envdata * env)
+ 180          {
+ 181   1                LCD_SEND_COM(LCD_COM_Line1);
+ 182   1      
+ 183   1                lcd_send_string("T:", 2);
+ 184   1                if (env->temp < -99) {
+ 185   2                          lcd_send_string("-", 1);
+ 186   2                          lcd_send_int((-env->temp)/10, 10);
+ 187   2                          lcd_send_string(".", 1);
+ 188   2                          lcd_send_int((-env->temp)%10, 1);
+ 189   2                } else if (env->temp < 0) {
+ 190   2                          lcd_send_string(" -", 2);
+ 191   2                          lcd_send_int((-env->temp)/10, 1);
+ 192   2                          lcd_send_string(".", 1);
+ 193   2                          lcd_send_int((-env->temp)%10, 1);
+ 194   2                } else if (env->temp < 100) {
+ 195   2                          lcd_send_string("  ", 2);
+ 196   2                          lcd_send_int(env->temp/10, 1);
+ 197   2                          lcd_send_string(".", 1);
+ 198   2                          lcd_send_int(env->temp%10, 1);
+ 199   2                } else {
+ 200   2                          lcd_send_string(" ", 1);
+ 201   2                          lcd_send_int(env->temp/10, 10);
+ 202   2                          lcd_send_string(".", 1);
+ 203   2                          lcd_send_int(env->temp%10, 1);
+ 204   2                }
+ 205   1                lcd_send_string("\337C RH:", 6);
+ 206   1                if (env->humidity > 9) {
+ 207   2                          lcd_send_string(" ", 1);
+ 208   2                          lcd_send_int(env->humidity, 1);
+ 209   2                } else {
+ 210   2                          lcd_send_int(env->humidity, 10);
+ 211   2                }
+ 212   1                lcd_send_string("%", 1);
+ 213   1                
+ 214   1                LCD_SEND_COM(LCD_COM_Line2);
+ 215   1      
+ 216   1                lcd_send_string("PM2.5: ", 7);
+ 217   1                if (env->pm2_5 > 99) {
+ 218   2                          lcd_send_int(env->pm2_5, 100);
+ 219   2                } else if (env->pm2_5 > 9) {
+ 220   2                          lcd_send_string(" ", 1);
+ 221   2                          lcd_send_int(env->pm2_5, 10);
+ 222   2                } else {
+ 223   2                          lcd_send_string("  ", 2);
+ 224   2                          lcd_send_int(env->pm2_5, 1);
+ 225   2                }
+ 226   1                lcd_send_string(" \344g/m3", 6);
+ 227   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1563    ----
+   CONSTANT SIZE    =    127    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      14
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,59 @@
+C51 COMPILER V9.59.0.0   MAIN                                                              08/06/2021 00:47:16 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(10) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <reg52.h>
+   2          
+   3          #include "main.h"
+   4          
+   5          void main()
+   6          {
+   7   1                struct time hakuTime =        {2021, 8, 3, 0,
+   8   1                                              {23, 59, 59, 1, 0},
+   9   1                                              0, 0};
+  10   1                struct alarms hakuAlarm =     {{6, 0, 0}, {6, 0, 0},
+  11   1                                              0, 0, 0, 0};
+  12   1                struct envdata hakuEnv =      {0, 0, 0, 0, 0, 0};
+  13   1                
+  14   1                //_nop_();
+  15   1                
+  16   1                
+  17   1                
+  18   1                
+  19   1                lcd_init();
+  20   1                ds_init();
+  21   1                ds_read_data(&hakuTime);
+  22   1      
+  23   1                lcd_show_clock(&hakuTime);
+  24   1                //lcd_show_alarm(&hakuAlarm);
+  25   1                //lcd_show_env(&hakuEnv);
+  26   1                //while (1) lcd_show_env(&hakuEnv);
+  27   1                while(1) {
+  28   2                          ds_read_data(&hakuTime);
+  29   2                          lcd_show_clock(&hakuTime);
+  30   2                }
+  31   1                
+  32   1                //return 0;
+  33   1      }
+  34          
+  35          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    101    ----
+   CONSTANT SIZE    =     38    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      38
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
