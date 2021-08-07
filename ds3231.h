@@ -31,6 +31,8 @@ sbit CLKSDA =	P0^7;
 #define CLK_ADDR_TEMP_LSB	0x12
 
 extern void ds_init (void);
-extern void ds_read_data(struct time *);
+extern void ds_read_data(struct time *, struct alarms *);
+extern void ds_write_time (struct time *);
+extern void ds_write_alarm (struct alarms *);
 
 #endif
