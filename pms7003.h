@@ -13,7 +13,7 @@
 #define PMS_DATA_CHECK_H	30
 #define PMS_DATA_CHECK_L	31
 
-extern void pms_read (struct envdata *, u8[]);
+extern void pms_serial_init (struct envdata *);
 
 #endif
 

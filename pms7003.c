@@ -1,5 +1,10 @@
+#include <reg52.h>
 #include "types.h"
 #include "pms7003.h"
+
+u8 pmsdata[PMS_DATA_LEN];
+u8 pmsdatacnt;
+struct envdata * envdata;
 
 void pms_read (struct envdata * env, u8 dat[])
 {
@@ -25,3 +30,28 @@ void pms_read (struct envdata * env, u8 dat[])
 	env->pm1_0 |= dat[PMS_DATA_PM1_0_L];
 }
 
+void pms_serial_init (struct envdata * env)
+{
+	TMOD = 0x20;
+	TH1 = 0xfd;
+	TL1 = 0xfd;
+	TR1 = 1;
+	PCON &= 0x7f;
+	SCON = 0x50;
+	IE = 0x95;
+	pmsdatacnt = 0;
+	envdata = env;
+}
+
+void pms_serial_interrupt (void) interrupt 4
+{
+	if (SBUF == PMS_DATA_START1) {
+		pmsdata[pmsdatacnt=0] = SBUF;
+	} else {
+		pmsdata[pmsdatacnt] = SBUF;
+	}
+	pmsdatacnt++;
+	if (pmsdatacnt == PMS_DATA_LEN)
+		pms_read(envdata, pmsdata);
+	RI = 0;
+}

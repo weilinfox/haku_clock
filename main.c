@@ -2,8 +2,6 @@
 
 #include "main.h"
 
-u8 pmsdata[PMS_DATA_LEN];
-u8 pmsdatacnt = 0;
 u8 showalarm = 0;
 u8 showenv = 0;
 u8 code day_of_month[] =	{0, 31, 28, 31, 30, 31, 30, 31, 31,
@@ -213,6 +211,7 @@ void main()
 	lcd_init();
 	ds_init();
 	dht_init();
+	pms_serial_init(&hakuEnv);
 
 	lcd_show_start();
 	/* delay around 1.5s */
