@@ -13,7 +13,7 @@ sbit LCDBUSY =	P0^3;
 /* lcd cs */
 sbit LCDEN =	P2^0;
 /* debug light */
-sbit DEBUG =	P2^2;
+sbit DEBUG =	P2^1;
 
 /* commands */
 /* #define LCD_COM_flag	0x00	command rs rw flag */
@@ -32,43 +32,21 @@ sbit DEBUG =	P2^2;
 #define LCD_COM_Line1	0x80	/* set cursor to line1 */
 #define LCD_COM_Line2	0xc0	/* set cursor to line2 */
 
-#define LCD_SEND_COM(com)	{lcd_busy_wait();		\
-			LCDDATA &= 0xc0;		\
-			LCDDATA |= com >> 4;	\
-			LCDEN = 1;		\
-			LCDEN = 0;		\
-			LCDDATA &= 0xc0;		\
-			LCDDATA |= com % 16;		\
-			LCDEN = 1;		\
-			LCDEN = 0;	}
-#define LCD_INIT_COM(com,dly)	{lcd_delay200us(dly);	\
-			LCDDATA &= 0xc0;		\
-			LCDDATA |= com >> 4;	\
-			LCDEN = 1;		\
-			LCDEN = 0;		\
-			LCDDATA &= 0xc0;		\
-			LCDDATA |= com % 16;	\
-			LCDEN = 1;		\
-			LCDEN = 0;	}
 /* data flag */
 #define LCD_DATA_Flag	0x20	/* & flag with your data */
-#define LCD_SEND_DATA(dat)	{lcd_busy_wait();			\
-			LCDDATA &= 0xc0;			\
-			LCDDATA |= (dat >> 4) | LCD_DATA_Flag;	\
-			LCDEN = 1;			\
-			LCDEN = 0;			\
-			LCDDATA &= 0xc0;			\
-			LCDDATA |= (dat % 16) | LCD_DATA_Flag;	\
-			LCDEN = 1;			\
-			LCDEN = 0;	}
 
 /* address */
 #define LCD_ADDR_Line1(n)	(0x01+(n))
 #define LCD_ADDR_Line2(n)	(0x41+(n))
 
+/* editpos define */
+#define EDIT_ALARM_MAX	12
+#define EDIT_TIME_MAX	13
+
 extern void lcd_init (void);
 extern void lcd_show_clock (struct time *);
 extern void lcd_show_alarm (struct alarms *);
 extern void lcd_show_env(struct envdata *);
+extern void lcd_show_start (void);
 
 #endif

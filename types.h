@@ -30,7 +30,7 @@ struct alarms {
 
 struct envdata {
 	s16 temp;
-	u16 humidity;		
+	u16 humidity;
 	u16 pm1_0, pm2_5, pm10;
 	u16 voc;
 };
