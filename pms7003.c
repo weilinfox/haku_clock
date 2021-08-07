@@ -45,13 +45,16 @@ void pms_serial_init (struct envdata * env)
 
 void pms_serial_interrupt (void) interrupt 4
 {
+	serial_debug = ~serial_debug;
 	if (SBUF == PMS_DATA_START1) {
 		pmsdata[pmsdatacnt=0] = SBUF;
 	} else {
 		pmsdata[pmsdatacnt] = SBUF;
 	}
 	pmsdatacnt++;
-	if (pmsdatacnt == PMS_DATA_LEN)
+	if (pmsdatacnt == PMS_DATA_LEN) {
 		pms_read(envdata, pmsdata);
+		env_get = ~env_get;
+	}
 	RI = 0;
 }

@@ -24,12 +24,8 @@
 #define SHOWDELAY	10;
 
 /* debug light */
-sbit serial_debug =	P2^3;	/* serial interrupt */
-sbit clock_debug =	P2^4;	/* clock interrupt */
-sbit alarm1_debug =	P2^5;	/* alarm happen */
-sbit alarm2_debug =	P2^6;	/* show alarm */
-sbit env_show =	P2^7;	/* show env data */
-
-
+sbit clock_debug =	P2^5;	/* clock interrupt */
+sbit alarm1_debug =	P2^6;	/* alarm happen */
+sbit alarm2_debug =	P2^7;	/* show alarm */
 
 #endif

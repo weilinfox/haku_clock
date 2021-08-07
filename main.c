@@ -255,6 +255,7 @@ void main()
 				if (showalarm) showalarm --;
 				if (showenv) showenv --;
 				psec = hakuTime.time.second;
+				clock_debug = ~clock_debug;
 			}
 		}
 
