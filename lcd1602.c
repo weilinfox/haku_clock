@@ -248,10 +248,10 @@ void lcd_show_env(struct envdata * env)
 	}
 	lcd_send_string("\337C RH:", 6);
 	if (env->humidity > 9) {
+		lcd_send_int(env->humidity, 10);
+	} else {
 		lcd_send_string(" ", 1);
 		lcd_send_int(env->humidity, 1);
-	} else {
-		lcd_send_int(env->humidity, 10);
 	}
 	lcd_send_string("%", 1);
 	
@@ -271,11 +271,11 @@ void lcd_show_env(struct envdata * env)
 }
 
 /* SDUST  weilinfox */
-/* Ver0.1  20210807 */
+/* Ver0.3  20210808 */
 void lcd_show_start (void)
 {
 	lcd_send_com(LCD_COM_Line1);
 	lcd_send_string("SDUST  weilinfox", 16);
 	lcd_send_com(LCD_COM_Line2);
-	lcd_send_string("Ver0.1  20210807", 16);
+	lcd_send_string("Ver0.3  20210808", 16);
 }

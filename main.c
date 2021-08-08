@@ -232,7 +232,6 @@ void main()
 	while(1) {
 		if (~edit) {
 			ds_read_data(&hakuTime, &hakuAlarm);
-			dht_read_data(&hakuEnv);
 			if (showalarm) lcd_show_alarm(&hakuAlarm);
 			else if (showenv) lcd_show_env(&hakuEnv);
 			else {
@@ -243,18 +242,20 @@ void main()
 			if (hakuAlarm.alarm1.second == hakuTime.time.second &&
 				hakuAlarm.alarm1.minute == hakuTime.time.minute &&
 				hakuAlarm.alarm1.hour == hakuTime.time.hour) {
-				alarm1_debug = 0;
-			} else alarm1_debug = 1;
-			if (hakuAlarm.alarm2.second == hakuTime.time.second &&
+				alarm_debug = 0;
+			} else if (hakuAlarm.alarm2.second == hakuTime.time.second &&
 				hakuAlarm.alarm2.minute == hakuTime.time.minute &&
 				hakuAlarm.alarm2.hour == hakuTime.time.hour) {
-				alarm2_debug = 0;
-			} else alarm2_debug = 1;
+				alarm_debug = 0;
+			} else {
+				alarm_debug = 1;
+			}
 			/* show delay */
 			if (psec != hakuTime.time.second) {
 				if (showalarm) showalarm --;
 				if (showenv) showenv --;
 				psec = hakuTime.time.second;
+				dht_read_data(&hakuEnv);
 				clock_debug = ~clock_debug;
 			}
 		}
