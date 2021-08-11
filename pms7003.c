@@ -6,34 +6,6 @@ u8 pmsdata[PMS_DATA_LEN];
 u8 pmsdatacnt;
 struct envdata * envdata;
 
-void pms_read (struct envdata * env, u8 dat[])
-{
-	u8 chkh = 0, chkl = 0, i;
-	ES = 0;
-	if (dat[0] != PMS_DATA_START1 || dat[1] != PMS_DATA_START2)
-		return;
-	
-	for (i = 0; i < PMS_DATA_CHECK_H; i += 2)
-		chkh += dat[i];
-	for (i = 1; i < PMS_DATA_CHECK_H; i += 2)
-		chkl += dat[i];
-	if (chkh != dat[PMS_DATA_CHECK_H] || chkl != dat[PMS_DATA_CHECK_L]) {
-		REN = 0;
-		return;
-	}
-	
-	env->pm10 = dat[PMS_DATA_PM10_H];
-	env->pm10 <<= 8;
-	env->pm10 |= dat[PMS_DATA_PM10_L];
-	env->pm2_5 = dat[PMS_DATA_PM2_5_H];
-	env->pm2_5 <<= 8;
-	env->pm2_5 |= dat[PMS_DATA_PM2_5_L];
-	env->pm1_0 = dat[PMS_DATA_PM1_0_H];
-	env->pm1_0 <<= 8;
-	env->pm1_0 |= dat[PMS_DATA_PM1_0_L];
-	ES = 1;
-}
-
 void pms_serial_init (struct envdata * env)
 {
 	TMOD = 0x20;
@@ -42,15 +14,19 @@ void pms_serial_init (struct envdata * env)
 	TR1 = 1;
 	PCON &= 0x7f;
 	SCON = 0x50;
-	IE = 0x95;
+	IE = 0x90;
 	pmsdatacnt = 0;
 	envdata = env;
 }
 
 void pms_serial_interrupt (void) interrupt 4
 {
-	TI = RI = 0;
+	u8 i;
+	u16 chk;
+
 	serial_debug = ~serial_debug;
+	if (pmsdatacnt >= PMS_DATA_LEN)
+		pmsdatacnt = 0;
 	if (SBUF == PMS_DATA_START1) {
 		pmsdata[pmsdatacnt=0] = SBUF;
 	} else if (pmsdatacnt) {
@@ -58,8 +34,30 @@ void pms_serial_interrupt (void) interrupt 4
 	}
 	pmsdatacnt++;
 	if (pmsdatacnt == PMS_DATA_LEN) {
-		pms_read(envdata, pmsdata);
+		//ES = 0;
+		//pms_read(envdata, pmsdata);
 		env_get = ~env_get;
+		chk = 0;
+		for (i = 0; i < PMS_DATA_CHECK_H; i++)
+			chk += pmsdata[i];
+		if (pmsdata[0] != PMS_DATA_START1 || pmsdata[1] != PMS_DATA_START2) {
+			;
+		} else if (chk>>8 != pmsdata[PMS_DATA_CHECK_H] || chk%0x0100 != pmsdata[PMS_DATA_CHECK_L]) {
+			env_get = ~env_get;
+		} else {
+			envdata->pm10 = pmsdata[PMS_DATA_PM10_H];
+			envdata->pm10 <<= 8;
+			envdata->pm10 |= pmsdata[PMS_DATA_PM10_L];
+			envdata->pm2_5 = pmsdata[PMS_DATA_PM2_5_H];
+			envdata->pm2_5 <<= 8;
+			envdata->pm2_5 |= pmsdata[PMS_DATA_PM2_5_L];
+			envdata->pm1_0 = pmsdata[PMS_DATA_PM1_0_H];
+			envdata->pm1_0 <<= 8;
+			envdata->pm1_0 |= pmsdata[PMS_DATA_PM1_0_L];
+		}
+
 		pmsdatacnt = 0;
+		//ES = 1;
 	}
+	TI = RI = 0;
 }
