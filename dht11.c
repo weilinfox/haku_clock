@@ -45,6 +45,7 @@ void dht_read_data (struct envdata * env)
 	u8 i, dat, sum = 0;
 	s16 temp = 0;
 	u16 humidity = 0;
+	EA = 0;
 	DHT_BUS = 0;
 	for (i = 18; i; i--)
 	for (dat = 100; dat; dat--)
@@ -85,4 +86,5 @@ void dht_read_data (struct envdata * env)
 	} else {
 		DHT_DEBUG = 0;
 	}
+	EA = 1;
 }

@@ -34,8 +34,6 @@ void pms_serial_interrupt (void) interrupt 4
 	}
 	pmsdatacnt++;
 	if (pmsdatacnt == PMS_DATA_LEN) {
-		//ES = 0;
-		//pms_read(envdata, pmsdata);
 		env_get = ~env_get;
 		chk = 0;
 		for (i = 0; i < PMS_DATA_CHECK_H; i++)
@@ -57,7 +55,6 @@ void pms_serial_interrupt (void) interrupt 4
 		}
 
 		pmsdatacnt = 0;
-		//ES = 1;
 	}
 	TI = RI = 0;
 }

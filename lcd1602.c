@@ -271,11 +271,11 @@ void lcd_show_env(struct envdata * env)
 }
 
 /* SDUST  weilinfox */
-/* Ver0.3  20210808 */
+/* Ver2.0  20210812 */
 void lcd_show_start (void)
 {
 	lcd_send_com(LCD_COM_Line1);
 	lcd_send_string("SDUST  weilinfox", 16);
 	lcd_send_com(LCD_COM_Line2);
-	lcd_send_string("Ver0.3  20210808", 16);
+	lcd_send_string("Ver2.0  20210812", 16);
 }
