@@ -17,15 +17,15 @@ u8 scan_keyboard (void)
 {
 	u8 i, j, k, l;
 	for (i = 0; i < 4; i++) {
-		PANEL = ~(0x80 >> i);
-		for(j=0;j<4;j++) if(~PANEL&(0x08>>j)) {
+		PANEL = ~(0x01 << i);
+		for(j=0;j<4;j++) if(~PANEL&(0x10<<j)) {
 			for (l = 20; l; l--)
 				for (k = 0xff; k; k--) ;
-			if (~PANEL&(0x08>>j)) {
-				while (~PANEL&(0x08>>j)) ;
+			if (~PANEL&(0x10<<j)) {
+				while (~PANEL&(0x10<<j)) ;
 				for (l = 20; l; l--)
 					for (k = 0xff; k; k--) ;
-				if (PANEL&(0x08>>j))
+				if (PANEL&(0x10<<j))
 					return i*4+j;
 			}
 		}
