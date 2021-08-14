@@ -24,7 +24,7 @@
 #define SHOWDELAY	10;
 
 /* debug light */
-sbit alarm_debug =	P2^6;	/* clock interrupt */
+sbit alarm_out =	P2^2;	/* clock interrupt */
 sbit clock_debug =	P2^7;	/* alarm happen */
 
 #endif

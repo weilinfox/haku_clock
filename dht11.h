@@ -3,7 +3,7 @@
 
 sbit DHT_BUS =	P2^1;
 
-sbit DHT_DEBUG =	P2^5;
+sbit DHT_DEBUG =	P2^6;
 
 extern void dht_read_data (struct envdata *);
 extern void dht_init (void);

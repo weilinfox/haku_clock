@@ -13,7 +13,7 @@ sbit LCDBUSY =	P0^3;
 /* lcd cs */
 sbit LCDEN =	P2^0;
 /* debug light */
-sbit DEBUG =	P2^2;
+sbit DEBUG =	P2^3;
 
 /* commands */
 /* #define LCD_COM_flag	0x00	command rs rw flag */

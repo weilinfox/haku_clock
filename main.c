@@ -242,13 +242,13 @@ void main()
 			if (hakuAlarm.alarm1.second == hakuTime.time.second &&
 				hakuAlarm.alarm1.minute == hakuTime.time.minute &&
 				hakuAlarm.alarm1.hour == hakuTime.time.hour) {
-				alarm_debug = 0;
+				alarm_out = 0;
 			} else if (hakuAlarm.alarm2.second == hakuTime.time.second &&
 				hakuAlarm.alarm2.minute == hakuTime.time.minute &&
 				hakuAlarm.alarm2.hour == hakuTime.time.hour) {
-				alarm_debug = 0;
+				alarm_out = 0;
 			} else {
-				alarm_debug = 1;
+				alarm_out = 1;
 			}
 			/* show delay */
 			if (psec != hakuTime.time.second) {
