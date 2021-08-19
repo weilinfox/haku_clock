@@ -6,6 +6,7 @@
 void dht_init ()
 {
 	DHT_BUS = 1;
+	DHT_DEBUG = 0;
 }
 
 void dht_delay10us (void)

@@ -256,7 +256,7 @@ void main()
 				if (showenv) showenv --;
 				psec = hakuTime.time.second;
 				dht_read_data(&hakuEnv);
-				clock_debug = ~clock_debug;
+				/*clock_debug = ~clock_debug;*/
 			}
 		}
 
