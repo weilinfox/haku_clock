@@ -27,4 +27,7 @@
 sbit alarm_out =	P2^2;	/* alarm happen */
 sbit clock_debug =	P2^7;	/* clock interrupt */
 
+/* stc watch dog */
+sfr WDT_CONTR = 0xE1;
+
 #endif
