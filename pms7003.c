@@ -17,7 +17,6 @@ void pms_serial_init (struct envdata * env)
 	IE = 0x90;
 	pmsdatacnt = 0;
 	envdata = env;
-	env_get = 0;
 	serial_debug = 0;
 }
 
@@ -26,7 +25,6 @@ void pms_serial_interrupt (void) interrupt 4
 	u8 i;
 	u16 chk;
 
-	serial_debug = 1;
 	if (pmsdatacnt >= PMS_DATA_LEN)
 		pmsdatacnt = 0;
 	if (SBUF == PMS_DATA_START1) {
@@ -52,7 +50,7 @@ void pms_serial_interrupt (void) interrupt 4
 			envdata->pm1_0 = pmsdata[PMS_DATA_PM1_0_H];
 			envdata->pm1_0 <<= 8;
 			envdata->pm1_0 |= pmsdata[PMS_DATA_PM1_0_L];
-			env_get = 1;
+			serial_debug = 1;
 		}
 
 		pmsdatacnt = 0;

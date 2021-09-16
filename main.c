@@ -187,6 +187,13 @@ bit update_alarm_check (struct alarms * ala)
 	return 1;
 }
 
+bit check_at_night (const struct time* tm)
+{
+	if (tm->time.hour >= 22 || tm->time.hour < 6)
+		return 1;
+	return 0;
+}
+
 void main()
 {
 	u8 code keyboard_num[16] =	{1, 2, 3, -1,
@@ -203,6 +210,7 @@ void main()
 	u8 editpos;		/* editpos ? alarm : time */
 	u8 keypress;		/* pressed key No. */
 	u8 psec;			/* detect another second */
+	u8 light;			/* lcd light */
 
 
 	PCON = 0x00;
@@ -212,6 +220,8 @@ void main()
 	ds_init();
 	dht_init();
 	pms_serial_init(&hakuEnv);
+	clock_debug = 0;
+	light = 1;
 
 	lcd_show_start();
 	/* delay around 1.5s */
@@ -226,15 +236,24 @@ void main()
 	psec = hakuTime.time.second;
 
 	lcd_show_clock(&hakuTime);
+	clock_debug = 1;
 	//lcd_show_alarm(&hakuAlarm);
 	//lcd_show_env(&hakuEnv);
 	//while (1) lcd_show_env(&hakuEnv);
 	while(1) {
 		if (~edit) {
 			ds_read_data(&hakuTime, &hakuAlarm);
-			if (showalarm) lcd_show_alarm(&hakuAlarm);
-			else if (showenv) lcd_show_env(&hakuEnv);
-			else {
+			if (showalarm) {
+				light = 1;
+				lcd_show_alarm(&hakuAlarm);
+			} else if (showenv) {
+				light = 1;
+				lcd_show_env(&hakuEnv);
+			} else {
+				if (check_at_night(&hakuTime))
+					light = 0;
+				else
+					light = 1;
 				editpos = 0;
 				lcd_show_clock(&hakuTime);
 			}
@@ -256,9 +275,13 @@ void main()
 				if (showenv) showenv --;
 				psec = hakuTime.time.second;
 				dht_read_data(&hakuEnv);
-				/*clock_debug = ~clock_debug;*/
 			}
+		} else {
+			light = 1;
 		}
+		/* light control */
+		if (light) lcd_light_on();
+		else lcd_light_off();
 
 		keypress = scan_keyboard();
 		switch (keypress) {

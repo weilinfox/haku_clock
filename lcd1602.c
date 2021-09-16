@@ -55,6 +55,16 @@ void lcd_busy_wait (void)
 	LCDEN = 0;
 }
 
+void lcd_light_on(void)
+{
+	LIGHT = 0;
+}
+
+void lcd_light_off(void)
+{
+	LIGHT = 1;
+}
+
 void lcd_send_data (u8 dat)
 {
 	lcd_busy_wait();
@@ -141,6 +151,7 @@ void lcd_init (void)
 	lcd_send_init_com(LCD_COM_Clear, 10);
 	lcd_send_init_com(LCD_COM_Setmode, 1);
 	lcd_send_com(LCD_COM_Cursoroff);
+	lcd_light_on();
 }
 
 /* ___yyyy/mm/dd___ */
@@ -277,5 +288,5 @@ void lcd_show_start (void)
 	lcd_send_com(LCD_COM_Line1);
 	lcd_send_string("SDUST  weilinfox", 16);
 	lcd_send_com(LCD_COM_Line2);
-	lcd_send_string("Ver2.0  20210812", 16);
+	lcd_send_string("Ver2.3  20210916", 16);
 }

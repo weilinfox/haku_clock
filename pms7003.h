@@ -14,9 +14,7 @@
 #define PMS_DATA_CHECK_L	31
 
 /* serial interrupt debug */
-sbit serial_debug =	P2^4;
-/* get env data */
-sbit env_get =	P2^5;
+sbit serial_debug =	P2^5;
 
 extern void pms_serial_init (struct envdata *);
 

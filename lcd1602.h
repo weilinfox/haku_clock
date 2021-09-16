@@ -13,7 +13,9 @@ sbit LCDBUSY =	P0^3;
 /* lcd cs */
 sbit LCDEN =	P2^0;
 /* debug light */
-sbit DEBUG =	P2^3;
+sbit DEBUG =	P2^4;
+/* lcd light */
+sbit LIGHT =	P2^3;
 
 /* commands */
 /* #define LCD_COM_flag	0x00	command rs rw flag */
@@ -48,5 +50,7 @@ extern void lcd_show_clock (struct time *);
 extern void lcd_show_alarm (struct alarms *);
 extern void lcd_show_env(struct envdata *);
 extern void lcd_show_start (void);
+extern void lcd_light_on (void);
+extern void lcd_light_off (void);
 
 #endif
