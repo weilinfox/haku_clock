@@ -1,4 +1,4 @@
-#include <reg52.h>
+#include <STC89C5xRC.H>
 
 #include "main.h"
 
@@ -214,9 +214,7 @@ void main()
 
 
 	PCON = 0x00;
-#ifdef WATCHDOG_ENABLE
 	WDT_CONTR = 0x33;
-#endif
 
 	lcd_init();
 	ds_init();
@@ -385,9 +383,7 @@ void main()
 				}
 				break;
 		}
-#ifdef WATCHDOG_ENABLE
 		WDT_CONTR = 0x33;
-#endif
 	}
 }
 
